@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scheda palestra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --steel:#E6E8EB; --paper:#F7F8F9; --ink:#1A1D22; --muted:#626A74; --line:#CDD2D8;
+    --blue:#1F4FA8; --blue-soft:#DCE5F5; --red:#C8312B; --red-soft:#F7DEDC;
+    --ok:#2A7A4B; --field:#FFFFFF;
+    --day:var(--blue); --day-soft:var(--blue-soft);
+    --cond:"Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif;
+    --sans:"Barlow",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --steel:#16191E; --paper:#1F232A; --ink:#ECEEF1; --muted:#9AA3AE; --line:#343A43;
+      --blue:#6E9BEA; --blue-soft:#1E2B44; --red:#EB6A62; --red-soft:#3E2220; --ok:#5CC48A; --field:#272C34;
+    }
+  }
+  :root[data-theme="dark"]{
+    --steel:#16191E; --paper:#1F232A; --ink:#ECEEF1; --muted:#9AA3AE; --line:#343A43;
+    --blue:#6E9BEA; --blue-soft:#1E2B44; --red:#EB6A62; --red-soft:#3E2220; --ok:#5CC48A; --field:#272C34;
+  }
+  :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  *,*::before,*::after{box-sizing:inherit;}
+  body{margin:0;background:var(--steel);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45;}
+  body.day-b{--day:var(--red);--day-soft:var(--red-soft);}
+  .wrap{max-width:760px;margin:0 auto;padding:0 14px 120px;}
+
+  header{padding:22px 0 10px;}
+  h1{font-family:var(--cond);font-weight:700;font-size:44px;line-height:.95;margin:0;letter-spacing:-.01em;}
+  .date{color:var(--muted);margin:6px 0 0;font-size:15px;}
+  .store{font-size:13px;color:var(--muted);margin:4px 0 0;}
+
+  .tabs{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin:16px 0 18px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--steel);padding:8px 0;}
+  .tab{font-family:var(--cond);font-size:20px;font-weight:600;border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:8px 12px;cursor:pointer;text-align:left;line-height:1.1;}
+  .tab small{display:block;font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--muted);}
+  .tab[aria-selected="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper);}
+  .tab[aria-selected="true"] small{color:inherit;opacity:.75;}
+  .tab[data-tab="A"][aria-selected="true"]{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .tab[data-tab="B"][aria-selected="true"]{background:var(--red);border-color:var(--red);color:#fff;}
+  .tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--day);outline-offset:2px;}
+
+  .ex{background:var(--paper);border-left:6px solid var(--day);border-radius:4px 12px 12px 4px;padding:14px 14px 12px;margin-bottom:12px;}
+  .ex-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .ex h3{font-family:var(--cond);font-weight:700;font-size:25px;margin:0;line-height:1.05;}
+  .scheme{font-family:var(--cond);font-weight:600;font-size:21px;color:var(--day);white-space:nowrap;}
+  .ref{font-size:13.5px;color:var(--muted);margin:3px 0 10px;}
+  .sets{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px;}
+  .set{display:flex;flex-direction:column;gap:3px;}
+  .set label{font-size:12.5px;color:var(--muted);}
+  .set input{width:100%;font-family:var(--cond);font-weight:700;font-size:28px;text-align:center;padding:6px 4px;border:2px solid var(--line);border-radius:8px;background:var(--field);color:var(--ink);-moz-appearance:textfield;}
+  .set input::-webkit-outer-spin-button,.set input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .set input:focus{border-color:var(--day);}
+  .set input::placeholder{color:var(--line);}
+  .last{font-size:12.5px;color:var(--muted);text-align:center;min-height:1.2em;}
+  .up{color:var(--ok);font-weight:600;}
+  .ex-foot{display:flex;gap:8px;margin-top:10px;align-items:center;}
+  .ex-foot input{flex:1;min-width:0;font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--field);color:var(--ink);}
+  .ghost{font:inherit;font-size:13.5px;font-weight:600;background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;cursor:pointer;white-space:nowrap;}
+  .ghost:hover{border-color:var(--ink);}
+
+  .savebar{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));z-index:10;}
+  .savebar .in{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:center;}
+  .savebar input[type=date]{font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--field);color:var(--ink);}
+  .primary{flex:1;font-family:var(--cond);font-weight:700;font-size:22px;background:var(--day);color:#fff;border:0;border-radius:10px;padding:11px 16px;cursor:pointer;}
+  .primary:disabled{opacity:.5;cursor:default;}
+  .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-size:14.5px;z-index:20;max-width:90vw;display:none;}
+  .toast.show{display:block;}
+
+  /* history */
+  .panel{background:var(--paper);border-radius:12px;padding:14px;margin-bottom:14px;}
+  .panel h2{font-family:var(--cond);font-size:26px;margin:0 0 8px;}
+  select{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--field);color:var(--ink);}
+  .tbl{overflow-x:auto;margin-top:10px;}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;}
+  th{text-align:left;font-weight:600;color:var(--muted);font-size:13px;padding:6px 8px;border-bottom:1px solid var(--line);}
+  td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top;}
+  td.num{font-family:var(--cond);font-size:19px;font-weight:600;white-space:nowrap;}
+  .sess{border-left:6px solid var(--blue);}
+  .sess.b{border-left-color:var(--red);}
+  .sess-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+  .sess-head b{font-family:var(--cond);font-size:22px;}
+  .sess ul{margin:8px 0 0;padding:0;list-style:none;font-size:14px;}
+  .sess li{padding:3px 0;border-top:1px dashed var(--line);display:flex;justify-content:space-between;gap:10px;}
+  .sess li span:last-child{font-family:var(--cond);font-size:17px;font-weight:600;white-space:nowrap;}
+  .del{color:var(--red);border-color:var(--red-soft);}
+  .empty{color:var(--muted);text-align:center;padding:24px 8px;}
+  .backup{display:flex;gap:8px;margin-top:4px;}
+  .backup .ghost{flex:1;font-size:15px;padding:11px 10px;}
+  .hint{font-size:13.5px;color:var(--muted);margin:10px 0 0;}
+  [hidden]{display:none!important;}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Scheda palestra</h1>
+    <p class="date" id="today"></p>
+    <p class="store" id="store">Caricamento dei dati…</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="A" aria-selected="true">Giorno A<small>Schiena, petto, spalle, braccia</small></button>
+    <button class="tab" role="tab" data-tab="B" aria-selected="false">Giorno B<small>Gambe</small></button>
+    <button class="tab" role="tab" data-tab="H" aria-selected="false">Storico<small>Progressi</small></button>
+  </div>
+
+  <main id="workout"></main>
+
+  <section id="history" hidden>
+    <div class="panel">
+      <h2>Backup dati</h2>
+      <div class="backup">
+        <button class="ghost" type="button" id="exportBtn">Esporta dati</button>
+        <button class="ghost" type="button" id="importBtn">Importa dati</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
+      </div>
+      <p class="hint" id="backupInfo"></p>
+    </div>
+    <div class="panel">
+      <h2>Andamento di un esercizio</h2>
+      <select id="exSelect" aria-label="Scegli esercizio"></select>
+      <div class="tbl"><table id="trend"></table></div>
+    </div>
+    <div id="sessions"></div>
+  </section>
+</div>
+
+<div class="savebar" id="savebar">
+  <div class="in">
+    <input type="date" id="sessDate" aria-label="Data allenamento">
+    <button class="primary" id="saveBtn">Salva allenamento</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const PLAN = {
+  A: [
+    {id:"lat1",  name:"Vertical traction",                 reps:[10,10,10]},
+    {id:"lat2",  name:"Vertical traction (due impugnature)",reps:[10,10,10]},
+    {id:"row",   name:"Rowing",                            reps:[8,8,8,10,10], scheme:"3×8 + 2×10"},
+    {id:"incl",  name:"Chest incline",                     reps:[10,10,10,10]},
+    {id:"cpress",name:"Chest press",                       reps:[10,10,10,10]},
+    {id:"pec",   name:"Pec deck",                          reps:[10,10,10,10]},
+    {id:"rdelt", name:"Rear delt",                         reps:[8,8,8,8]},
+    {id:"delt",  name:"Deltoid",                           reps:[10,10,10,10]},
+    {id:"bic",   name:"Bicipiti",                          reps:[10,10,10], ref:"5 kg"},
+    {id:"tri",   name:"Tricipiti",                         reps:[10,10,10], ref:"5 kg"},
+    {id:"tricab",name:"Tricipiti ai cavi (triangolo)",     reps:[12,12,12]}
+  ],
+  B: [
+    {id:"leg",   name:"Leg",                               reps:[6,8,10,12], scheme:"6-8-10-12", ref:"50 – 55 – 60 kg"},
+    {id:"press", name:"Pressa",                            reps:[10,10,10,10], ref:"90 kg (non ancora comodo)"},
+    {id:"curl",  name:"Flessore",                          reps:[10,10,10,10], ref:"20 – 25 – 30 kg"},
+    {id:"add",   name:"Interno",                           reps:[8,8,8,8], ref:"30 – 35 – 35 – 40 kg (intenso)"},
+    {id:"abd",   name:"Esterno",                           reps:[10,10,10,10], ref:"25 – 40 kg"},
+    {id:"glute", name:"Glutei",                            reps:[10,10,10,10], ref:"15 – 25 – 45 – 45 kg"},
+    {id:"calf",  name:"Polpacci",                          reps:[10,10,10,10], ref:"15 – 20 – 20 – 25 kg"}
+  ]
+};
+const ALL = [...PLAN.A.map(e=>({...e,day:"A"})), ...PLAN.B.map(e=>({...e,day:"B"}))];
+const byId = Object.fromEntries(ALL.map(e=>[e.id,e]));
+function schemeOf(e){
+  if (e.scheme) return e.scheme;
+  const r = e.reps; return r.every(x=>x===r[0]) ? `${r.length}×${r[0]}` : r.join("-");
+}
+
+/* ---------- storage: db (private per user) with localStorage fallback ---------- */
+let sessions = [];          // [{key, date, day, createdAt, entries}]
+let col = null;             // db collection when available
+const LS_KEY = "gymlog-sessions-v1";
+const store = document.getElementById("store");
+
+function lsRead(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||"[]"); }catch(e){ return []; } }
+function lsWrite(list){ try{ localStorage.setItem(LS_KEY, JSON.stringify(list)); return true; }catch(e){ return false; } }
+
+function useLocal(){
+  col = null;
+  sessions = lsRead();
+  store.textContent = "Dati salvati su questo dispositivo.";
+  renderAll();
+}
+
+async function initStorage(){
+  try{
+    if (!window.claude || !window.claude.use){ useLocal(); return; }
+    const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    if (!db || !user){ useLocal(); return; }
+    const uid = await user.id();
+    if (!uid){ useLocal(); return; }
+    col = db.collection("data/users/" + uid + "/sessions");
+    col.onSnapshot(snap => {
+      sessions = snap.docs.map(d => ({key:d.id, ...d.data()}));
+      store.textContent = "Dati salvati nel tuo account: li ritrovi da ogni dispositivo.";
+      renderAll();
+    }, () => { useLocal(); store.textContent = "Account non raggiungibile: dati salvati su questo dispositivo."; });
+  }catch(e){ useLocal(); }
+}
+
+async function saveSession(s){
+  if (col){ await col.add(s); return; }
+  const list = lsRead(); list.push({key: "l"+Date.now(), ...s});
+  if (!lsWrite(list)) throw new Error("storage");
+  sessions = list; renderAll();
+}
+async function deleteSession(key){
+  if (col){ await col.doc(key).delete(); return; }
+  const list = lsRead().filter(s=>s.key!==key); lsWrite(list); sessions = list; renderAll();
+}
+
+/* ---------- helpers ---------- */
+const sorted = () => [...sessions].sort((a,b)=> (b.date||"").localeCompare(a.date||"") || (b.createdAt||0)-(a.createdAt||0));
+function lastFor(exId){
+  for (const s of sorted()){ const e = s.entries && s.entries[exId]; if (e && e.kg && e.kg.some(v=>v!=null)) return {date:s.date, ...e}; }
+  return null;
+}
+const fmt = v => v==null ? "–" : (Number.isInteger(v) ? String(v) : String(v).replace(".",","));
+const fmtDate = d => { if(!d) return ""; const [y,m,dd]=d.split("-"); return `${dd}/${m}/${y}`; };
+const isoToday = () => { const t=new Date(); t.setMinutes(t.getMinutes()-t.getTimezoneOffset()); return t.toISOString().slice(0,10); };
+function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2600); }
+
+/* ---------- draft (unsaved inputs) ---------- */
+const draftKey = d => "gymlog-draft-"+d;
+function readDraft(d){ try{ return JSON.parse(localStorage.getItem(draftKey(d))||"{}"); }catch(e){ return {}; } }
+function writeDraft(d,obj){ try{ localStorage.setItem(draftKey(d), JSON.stringify(obj)); }catch(e){} }
+function clearDraft(d){ try{ localStorage.removeItem(draftKey(d)); }catch(e){} }
+
+/* ---------- rendering ---------- */
+let current = "A";
+let draftTimer;
+const main = document.getElementById("workout");
+
+function flushDraft(){
+  clearTimeout(draftTimer);
+  if (main.dataset.day && main.querySelector(".ex")) writeDraft(main.dataset.day, collect());
+}
+function renderWorkout(){
+  flushDraft();
+  const draft = readDraft(current);
+  main.innerHTML = "";
+  main.dataset.day = current;
+  PLAN[current].forEach(ex => {
+    const last = lastFor(ex.id);
+    const d = draft[ex.id] || {};
+    const card = document.createElement("article");
+    card.className = "ex";
+    const refTxt = last ? `Ultima volta (${fmtDate(last.date)}): ${last.kg.map(fmt).join(" – ")} kg`
+                        : (ex.ref ? `Partenza: ${ex.ref}` : "Prima volta: annota i kg usati");
+    card.innerHTML = `
+      <div class="ex-top"><h3></h3><span class="scheme">${schemeOf(ex)}</span></div>
+      <p class="ref"></p>
+      <div class="sets"></div>
+      <div class="ex-foot">
+        <input type="text" placeholder="Nota (es. sedile 4, facile)" aria-label="Nota ${ex.name}">
+        ${last ? '<button class="ghost" type="button">Usa kg ultima volta</button>' : ''}
+      </div>`;
+    card.querySelector("h3").textContent = ex.name;
+    card.querySelector(".ref").textContent = refTxt;
+    const sets = card.querySelector(".sets");
+    ex.reps.forEach((r,i) => {
+      const prev = last && last.kg[i] != null ? last.kg[i] : null;
+      const wrap = document.createElement("div");
+      wrap.className = "set";
+      const inId = `${ex.id}-${i}`;
+      wrap.innerHTML = `<label for="${inId}">Serie ${i+1} · ${r} rip</label>
+        <input id="${inId}" type="number" inputmode="decimal" step="0.5" min="0" placeholder="${prev!=null?fmt(prev):'kg'}">
+        <div class="last"></div>`;
+      const input = wrap.querySelector("input");
+      const lastEl = wrap.querySelector(".last");
+      if (d.kg && d.kg[i] != null) input.value = d.kg[i];
+      const showDelta = () => {
+        const v = parseFloat(String(input.value).replace(",","."));
+        if (prev!=null && !isNaN(v) && v>prev){ lastEl.innerHTML = `<span class="up">+${fmt(Math.round((v-prev)*10)/10)} kg</span>`; }
+        else lastEl.textContent = prev!=null ? `prima ${fmt(prev)}` : "";
+      };
+      input.addEventListener("input", () => { showDelta(); saveDraftFromDom(); });
+      showDelta();
+      sets.appendChild(wrap);
+    });
+    const note = card.querySelector(".ex-foot input");
+    note.value = d.note || "";
+    note.addEventListener("input", saveDraftFromDom);
+    const copy = card.querySelector(".ghost");
+    if (copy) copy.addEventListener("click", () => {
+      card.querySelectorAll(".set input").forEach((inp,i)=>{ if (last.kg[i]!=null){ inp.value = last.kg[i]; inp.dispatchEvent(new Event("input")); } });
+    });
+    card.dataset.ex = ex.id;
+    main.appendChild(card);
+  });
+}
+
+function collect(){
+  const entries = {};
+  main.querySelectorAll(".ex").forEach(card => {
+    const kg = [...card.querySelectorAll(".set input")].map(i => { const v = parseFloat(String(i.value).replace(",",".")); return isNaN(v) ? null : v; });
+    const note = card.querySelector(".ex-foot input").value.trim();
+    if (kg.some(v=>v!=null) || note) entries[card.dataset.ex] = {kg, note};
+  });
+  return entries;
+}
+function saveDraftFromDom(){ clearTimeout(draftTimer); const d = main.dataset.day; draftTimer = setTimeout(()=>writeDraft(d, collect()), 300); }
+
+function renderHistory(){
+  backupInfo();
+  const sel = document.getElementById("exSelect");
+  const keep = sel.value;
+  sel.innerHTML = ALL.map(e=>`<option value="${e.id}">${e.day} · ${e.name}</option>`).join("");
+  if (keep) sel.value = keep;
+  renderTrend();
+
+  const box = document.getElementById("sessions");
+  const list = sorted();
+  if (!list.length){ box.innerHTML = `<p class="empty">Nessun allenamento salvato. Compila il Giorno A o B e premi "Salva allenamento".</p>`; return; }
+  box.innerHTML = "";
+  list.forEach(s => {
+    const el = document.createElement("div");
+    el.className = "panel sess" + (s.day==="B" ? " b":"");
+    const items = Object.entries(s.entries||{}).map(([id,e]) => {
+      const name = byId[id] ? byId[id].name : id;
+      const kg = (e.kg||[]).some(v=>v!=null) ? e.kg.map(fmt).join(" · ")+" kg" : "";
+      return `<li><span>${escapeHtml(name)}${e.note ? ` <em style="color:var(--muted)">— ${escapeHtml(e.note)}</em>`:""}</span><span>${kg}</span></li>`;
+    }).join("");
+    el.innerHTML = `<div class="sess-head"><b>Giorno ${s.day} · ${fmtDate(s.date)}</b><button class="ghost del" type="button">Elimina</button></div><ul>${items}</ul>`;
+    el.querySelector(".del").addEventListener("click", async () => {
+      if (!confirm(`Eliminare l'allenamento del ${fmtDate(s.date)}?`)) return;
+      try{ await deleteSession(s.key); toast("Allenamento eliminato"); }catch(e){ toast("Eliminazione non riuscita: riprova"); }
+    });
+    box.appendChild(el);
+  });
+}
+
+function renderTrend(){
+  const id = document.getElementById("exSelect").value || ALL[0].id;
+  const ex = byId[id];
+  const rows = sorted().filter(s => s.entries && s.entries[id] && (s.entries[id].kg||[]).some(v=>v!=null));
+  const t = document.getElementById("trend");
+  if (!rows.length){ t.innerHTML = `<tr><td class="empty">Ancora nessun dato per ${escapeHtml(ex.name)}.${ex.ref ? " Partenza annotata: "+escapeHtml(ex.ref)+"." : ""}</td></tr>`; return; }
+  t.innerHTML = `<tr><th>Data</th><th>kg per serie</th><th>Max</th><th>Volume</th></tr>` + rows.map(s => {
+    const kg = s.entries[id].kg;
+    const max = Math.max(...kg.filter(v=>v!=null));
+    const vol = kg.reduce((a,v,i)=> a + (v||0)*(ex.reps[i]||0), 0);
+    return `<tr><td>${fmtDate(s.date)}</td><td class="num">${kg.map(fmt).join(" · ")}</td><td class="num">${fmt(max)}</td><td class="num">${Math.round(vol)}</td></tr>`;
+  }).join("");
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function renderAll(){
+  if (current === "H") renderHistory(); else renderWorkout();
+}
+
+/* ---------- tabs & save ---------- */
+document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => {
+  flushDraft();
+  current = btn.dataset.tab;
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b===btn)));
+  document.body.classList.toggle("day-b", current==="B");
+  const hist = current==="H";
+  document.getElementById("history").hidden = !hist;
+  main.hidden = hist;
+  document.getElementById("savebar").hidden = hist;
+  renderAll();
+  window.scrollTo({top:0});
+}));
+
+document.getElementById("saveBtn").addEventListener("click", async () => {
+  const entries = collect();
+  if (!Object.keys(entries).length){ toast("Inserisci almeno un peso prima di salvare"); return; }
+  const btn = document.getElementById("saveBtn");
+  btn.disabled = true;
+  try{
+    await saveSession({date: document.getElementById("sessDate").value || isoToday(), day: current, createdAt: Date.now(), entries});
+    main.innerHTML = "";
+    clearDraft(current);
+    renderWorkout();
+    toast(`Allenamento salvato (Giorno ${current})`);
+  }catch(e){
+    toast("Salvataggio non riuscito: i dati restano nei campi, riprova");
+  }finally{ btn.disabled = false; }
+});
+
+/* ---------- export / import ---------- */
+const LAST_EXPORT = "gymlog-last-export";
+function backupInfo(){
+  let d = null; try{ d = localStorage.getItem(LAST_EXPORT); }catch(e){}
+  document.getElementById("backupInfo").textContent =
+    (sessions.length ? `${sessions.length} allenamenti salvati. ` : "Nessun allenamento salvato. ") +
+    (d ? `Ultima esportazione: ${fmtDate(d)}.` : "Non hai ancora esportato i dati.");
+}
+function cleanSession(s){
+  const entries = {};
+  Object.entries(s.entries || {}).forEach(([id, e]) => {
+    if (!e || typeof e !== "object") return;
+    const kg = Array.isArray(e.kg) ? e.kg.map(v => (typeof v === "number" && isFinite(v)) ? v : null) : [];
+    const note = typeof e.note === "string" ? e.note.slice(0, 200) : "";
+    entries[String(id).slice(0, 40)] = {kg, note};
+  });
+  return {date: s.date, day: s.day, createdAt: Number(s.createdAt) || Date.now(), entries};
+}
+async function exportData(){
+  const day = isoToday();
+  const payload = {
+    app: "scheda-palestra", version: 1,
+    exportedAt: day, exportedAtTime: new Date().toISOString(),
+    sessions: sorted().map(s => cleanSession(s))
+  };
+  const data = JSON.stringify(payload, null, 2);
+  const filename = `scheda-palestra-${day}.json`;
+  let saved = false;
+  try{
+    const dl = (window.claude && window.claude.use) ? await claude.use("downloads") : null;
+    if (dl){ await dl.save({filename, data}); saved = true; }
+  }catch(e){
+    if (e && e.code === "declined"){ toast("Esportazione annullata"); return; }
+    if (e && e.code === "rate_limited"){ toast("Attendi qualche secondo e riprova"); return; }
+  }
+  if (!saved){
+    const url = URL.createObjectURL(new Blob([data], {type: "application/json"}));
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  try{ localStorage.setItem(LAST_EXPORT, day); }catch(e){}
+  backupInfo();
+  toast(`Dati esportati: ${filename}`);
+}
+async function importData(file){
+  let payload;
+  try{ payload = JSON.parse(await file.text()); }
+  catch(e){ toast("File non valido: scegli un file .json esportato da questa pagina"); return; }
+  const list = Array.isArray(payload) ? payload : (payload && payload.sessions);
+  if (!Array.isArray(list)){ toast("File non valido: non contiene allenamenti"); return; }
+  const sig = s => `${s.date}|${s.day}|${s.createdAt}`;
+  const have = new Set(sessions.map(sig));
+  const fresh = list
+    .filter(s => s && (s.day === "A" || s.day === "B") && /^\d{4}-\d{2}-\d{2}$/.test(s.date || "") && s.entries && typeof s.entries === "object")
+    .map(cleanSession)
+    .filter(s => !have.has(sig(s)));
+  if (!fresh.length){ toast("Nessun allenamento nuovo da importare"); return; }
+  if (!confirm(`Importare ${fresh.length} allenamenti? Quelli già presenti non vengono duplicati.`)) return;
+  try{
+    if (col){ for (const s of fresh){ await col.add(s); } }
+    else {
+      const cur = lsRead();
+      fresh.forEach((s, i) => cur.push({key: "l" + Date.now() + "-" + i, ...s}));
+      if (!lsWrite(cur)) throw new Error("storage");
+      sessions = cur; renderAll();
+    }
+    toast(`Importati ${fresh.length} allenamenti`);
+  }catch(e){ toast("Importazione non riuscita: riprova"); }
+}
+document.getElementById("exportBtn").addEventListener("click", exportData);
+document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importFile").click());
+document.getElementById("importFile").addEventListener("change", e => {
+  const f = e.target.files && e.target.files[0];
+  if (f) importData(f);
+  e.target.value = "";
+});
+
+document.getElementById("today").textContent = new Date().toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+document.getElementById("sessDate").value = isoToday();
+document.getElementById("exSelect").addEventListener("change", renderTrend);
+renderWorkout();
+initStorage();
+</script>
+</body>
+</html>
